@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <title></title>
+
+    <style>*{box-sizing:border-box;font-family:Roboto,sans-serif;margin:0}body,html{height:100%;width:100%}button:not(:disabled),select{cursor:pointer}img,video{max-width:100%}img.full{height:100%;left:0;object-fit:contain;position:absolute;top:0;width:100%;z-index:1}body:has(img.full) #overlay{display:block}img[data-src],video[data-src]{display:none}table{border-collapse:collapse;width:100%}table,td,th{border:1px solid #000}td,th{padding:5px}mark{background-color:#fff59d}#overlay{background-color:rgba(0,0,0,.5);display:none;height:100%;left:0;position:absolute;top:0;width:100%}#header{background-color:#2196f3;color:#fff;font-size:20px;font-weight:700;height:50px;line-height:50px;text-align:center;width:100%}@media (min-width:600px){#header{font-size:30px}}#header button{background-color:transparent;border:0;color:#fff;font-size:20px;font-weight:700;height:100%;padding:0;width:30px}#header button:disabled{opacity:.5}#header button:not(:disabled):hover{background-color:hsla(0,0%,100%,.2)}#header button:not(:disabled):active{background-color:hsla(0,0%,100%,.4)}#first,#previous{float:left}#last,#next{float:right}#content{font-size:16px;height:calc(100% - 55px);overflow-y:scroll;padding:10px;width:100%}#content *{margin:revert}#progress-bar{background-color:#e0e0e0;height:5px;width:100%}#progress{background-color:#757575;height:100%}#day-select,#s2t{border:0;color:#fff;font-size:15px;height:30px;position:absolute;right:20px;width:100px}#s2t{background-color:#4caf50;bottom:40px;display:none}#s2t:hover{background-color:#43a047}#s2t:active{background-color:#388e3c}#day-select{background-color:#424242;bottom:5px;text-align:center}#day-select:hover{background-color:#3b3b3b}#day-select:active{background-color:#333}.c,code{background-color:#ffab91;font-family:Roboto Mono,monospace;padding:2px 4px}table.num-right td{text-align:right}</style>
+  </head>
+
+  <body>
+    <div id="header">
+      <button id="first">&lt;&lt;</button>
+      <button id="previous">&lt;</button>
+      <button id="last">&gt;&gt;</button>
+      <button id="next">&gt;</button>
+
+      <p id="title"></p>
+    </div>
+
+    <div id="progress-bar">
+      <div id="progress"></div>
+    </div>
+
+    <div id="content"></div>
+
+    <button id="s2t">Scroll to top</button>
+
+    <select id="day-select"></select>
+
+    <div id="overlay"></div>
+
+    <script>const days=[{day:1,meta:{date:"July 3",caption:"First day"},content:'\x3c!--\ndate = "July 3"\ncaption = "First day"\n--\x3e\n<p>TODO</p>\n'},{day:2,meta:{date:"July 4",caption:"Second day"},content:'\x3c!--\ndate = "July 4"\ncaption = "Second day"\n--\x3e\n<p>TODO</p>\n'},{day:3,meta:{date:"July 5",caption:"Third day"},content:'\x3c!--\ndate = "July 5"\ncaption = "Third day"\n--\x3e\n<h1 id="x-content">Content</h1>\n<div style="padding: 10px; background-color: #e0e0e0;">\n# Activities\n</div>\n---\n# Content\n<div style="padding: 10px; background-color: #e0e0e0;">\n# Activities\n</div>\n'},{day:4,meta:{date:"July 8",caption:"Second week"},content:'\x3c!--\ndate = "July 8"\ncaption = "Second week"\n--\x3e\n<h1 id="x-content">Content</h1>\n<div style="padding: 10px; background-color: #e0e0e0;">\n# Activities\n</div>\n___\n# Content\n<div style="padding: 10px; background-color: #e0e0e0;">\n# Activities\n</div>\n'}],$=document.querySelector.bind(document),firstBtn=$("#first"),prevBtn=$("#previous"),nextBtn=$("#next"),lastBtn=$("#last"),title=$("#title"),content=$("#content"),progress=$("#progress"),s2t=$("#s2t"),daySelect=$("#day-select");let currentDay=null,ie=null;for(const t of days){const e=document.createElement("option");e.value=t.day,e.textContent=`Day ${t.day}`,daySelect.appendChild(e)}function renderDay(t){if(currentDay===t)return;content.scrollTop=0,currentDay=t;let e=days.findIndex((e=>e.day===t));-1===e&&(e=days.length-1),t=days[e];const n=new URLSearchParams(window.location.search);n.set("day",t.day),window.history.replaceState({},"",`${window.location.pathname}?${n}`),[firstBtn,prevBtn,nextBtn,lastBtn].forEach((t=>{t.disabled=!1})),0===e&&(firstBtn.disabled=!0,prevBtn.disabled=!0),e===days.length-1&&(nextBtn.disabled=!0,lastBtn.disabled=!0),1===e&&(firstBtn.disabled=!0),e===days.length-2&&(lastBtn.disabled=!0),daySelect.value=t.day,document.title=title.textContent=`Day ${t.day}${t.meta.caption?`: ${t.meta.caption}`:""}`,content.innerHTML=`${t.meta.date}<br /><hr />${t.content}`,ie&&ie.destroy(),document.querySelectorAll("video[data-src]").forEach((t=>{const e=document.createElement("button");e.textContent=`Load video (${t.dataset.src.split("/").pop()})`,e.addEventListener("click",(()=>{const n=document.createElement("source");n.src=t.dataset.src,n.type="video/mp4",delete t.dataset.src,t.appendChild(n),t.load(),e.remove()})),t.parentNode.insertBefore(e,t)})),document.querySelectorAll("img[data-src]").forEach((t=>{const e=document.createElement("button");e.textContent=`Load image (${t.dataset.src.split("/").pop()})`,e.addEventListener("click",(()=>{t.src=t.dataset.src,delete t.dataset.src,e.remove()})),t.parentNode.insertBefore(e,t)})),progress.style.width="0%"}firstBtn.addEventListener("click",(()=>{renderDay(days[0].day)})),prevBtn.addEventListener("click",(()=>{const t=days.findIndex((t=>t.day===currentDay));renderDay(days[t-1].day)})),nextBtn.addEventListener("click",(()=>{const t=days.findIndex((t=>t.day===currentDay));renderDay(days[t+1].day)})),lastBtn.addEventListener("click",(()=>{renderDay(days[days.length-1].day)})),content.addEventListener("scroll",(()=>{content.scrollTop>200?s2t.style.display="block":s2t.style.display="none";const t=content.scrollHeight-content.clientHeight;progress.style.width=content.scrollTop/t*100+"%"})),s2t.addEventListener("click",(()=>{content.scrollTop=0})),daySelect.addEventListener("change",(t=>{renderDay(+t.target.value)}));const params=new URLSearchParams(window.location.search);params.has("day")&&Number.isInteger(+params.get("day"))?renderDay(+params.get("day")):renderDay(days[days.length-1].day),document.addEventListener("click",(t=>{"IMG"===t.target.tagName?t.target.classList.toggle("full"):t.target.id&&t.target.id.startsWith("x-")&&(window.location.hash=t.target.id)}));</script>
+  </body>
+</html>
